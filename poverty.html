@@ -1,0 +1,3628 @@
+```html
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Household Poverty Prediction for Programme Targeting · CSE 276</title>
+  <meta name="description" content="Machine learning that helps social-protection programmes reach the households that need them most. DrivenData Pover-T data · CSE 276 Machine Learning." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F7F8FA;
+      --surface: #FFFFFF;
+      --surface-subtle: #F1F5F9;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --border: #E2E8F0;
+      --teal: #0D9488;
+      --teal-soft: rgba(13, 148, 136, 0.12);
+      --indigo: #4F46E5;
+      --indigo-soft: rgba(79, 70, 229, 0.12);
+      --amber: #F59E0B;
+      --amber-soft: rgba(245, 158, 11, 0.14);
+      --rose: #E11D48;
+      --rose-soft: rgba(225, 29, 72, 0.12);
+      --nav-bg: rgba(247, 248, 250, 0.82);
+      --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.05), 0 1px 3px -1px rgba(15, 23, 42, 0.03);
+      --shadow-md: 0 12px 32px -8px rgba(15, 23, 42, 0.07), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+      --shadow-hover: 0 20px 40px -12px rgba(15, 23, 42, 0.11), 0 6px 16px -4px rgba(15, 23, 42, 0.05);
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition: 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0B1220;
+      --surface: #121A2B;
+      --surface-subtle: #182338;
+      --ink: #E6EAF2;
+      --muted: #8A97AD;
+      --border: #1F2A40;
+      --teal: #2DD4BF;
+      --teal-soft: rgba(45, 212, 191, 0.14);
+      --indigo: #818CF8;
+      --indigo-soft: rgba(129, 140, 248, 0.14);
+      --amber: #F59E0B;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --rose: #E11D48;
+      --rose-soft: rgba(225, 29, 72, 0.18);
+      --nav-bg: rgba(11, 18, 32, 0.82);
+      --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 14px 34px -8px rgba(0, 0, 0, 0.45);
+      --shadow-hover: 0 20px 42px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 84px;
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    /* Scroll Progress Bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--indigo));
+      z-index: 1000;
+      transition: width 60ms linear;
+    }
+
+    /* Focus states */
+    :focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      color: var(--ink);
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+    }
+
+    p {
+      color: var(--muted);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        padding: 0 36px;
+      }
+    }
+
+    section {
+      padding: 80px 0;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (min-width: 960px) {
+      section {
+        padding: 108px 0;
+      }
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin-bottom: 48px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .section-desc {
+      font-size: clamp(1rem, 1.5vw, 1.125rem);
+      color: var(--muted);
+    }
+
+    /* Sticky Navigation */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 68px;
+      gap: 12px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--ink);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.98rem;
+      min-height: 44px;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--teal), var(--indigo));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    @media (min-width: 1024px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      min-height: 44px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: color var(--transition), background-color var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+      background: var(--surface-subtle);
+    }
+
+    .nav-links a.active {
+      color: var(--teal);
+      background: var(--teal-soft);
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), background-color var(--transition);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--teal);
+      transform: translateY(-1px);
+    }
+
+    .mobile-menu-btn {
+      display: inline-flex;
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 12px 20px 16px;
+    }
+
+    .mobile-nav-drawer.open {
+      display: block;
+    }
+
+    .mobile-nav-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 420px) {
+      .mobile-nav-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mobile-nav-list a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: var(--surface-subtle);
+    }
+
+    .mobile-nav-list a.active {
+      color: var(--teal);
+      background: var(--teal-soft);
+      font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      padding: 72px 0 92px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (min-width: 960px) {
+      .hero {
+        padding: 112px 0 128px;
+      }
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+
+    .mesh-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    html[data-theme="dark"] .mesh-blob {
+      opacity: 0.22;
+    }
+
+    .blob-teal {
+      width: 420px;
+      height: 420px;
+      background: var(--teal);
+      top: -120px;
+      right: -80px;
+    }
+
+    .blob-indigo {
+      width: 380px;
+      height: 380px;
+      background: var(--indigo);
+      bottom: -140px;
+      left: -100px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .hero-tag-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .hero-title {
+      font-size: clamp(2.15rem, 5vw, 3.85rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+    }
+
+    .hero-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: wordFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      margin-right: 0.24em;
+    }
+
+    @keyframes wordFadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.08rem, 2vw, 1.32rem);
+      color: var(--muted);
+      max-width: 660px;
+      margin-bottom: 34px;
+      line-height: 1.55;
+    }
+
+    .stat-chips {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 36px;
+      max-width: 760px;
+    }
+
+    @media (min-width: 640px) {
+      .stat-chips {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .stat-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--teal);
+    }
+
+    .stat-chip-value {
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .stat-chip-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 24px;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition), border-color var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: #FFFFFF;
+      border: 1px solid transparent;
+      box-shadow: 0 8px 20px -6px rgba(13, 148, 136, 0.45);
+    }
+
+    html[data-theme="dark"] .btn-primary {
+      color: #08101D;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -6px rgba(13, 148, 136, 0.6);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      border-color: var(--ink);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Cards & Grid Utilities */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 30px;
+      }
+    }
+
+    .card-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 860px) {
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Section 2: The Problem */
+    .problem-lead {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (min-width: 860px) {
+      .problem-lead {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .problem-pillar {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .pillar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--ink);
+    }
+
+    .pillar-text h3 {
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .pillar-text p {
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .error-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .error-card.exclusion {
+      border-top: 4px solid var(--amber);
+    }
+
+    .error-card.inclusion {
+      border-top: 4px solid var(--indigo);
+    }
+
+    .error-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .badge-indigo {
+      background: var(--indigo-soft);
+      color: var(--indigo);
+    }
+
+    .badge-teal {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .badge-rose {
+      background: var(--rose-soft);
+      color: var(--rose);
+    }
+
+    .formula-box {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .formula-box .formula-lhs {
+      color: var(--ink);
+    }
+
+    .formula-box .formula-rhs {
+      color: var(--amber);
+    }
+
+    .error-card.inclusion .formula-box .formula-rhs {
+      color: var(--indigo);
+    }
+
+    /* Section 3: Dataset */
+    .country-donut-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .donut-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .donut-svg-wrap {
+      position: relative;
+      width: 108px;
+      height: 108px;
+      flex-shrink: 0;
+    }
+
+    .donut-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .donut-track {
+      fill: none;
+      stroke: var(--surface-subtle);
+      stroke-width: 10;
+    }
+
+    .donut-fill {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 263.89;
+      stroke-dashoffset: 263.89;
+      transition: stroke-dashoffset 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .donut-pct {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .donut-sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .country-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .meta-item {
+      background: var(--surface-subtle);
+      padding: 10px 12px;
+      border-radius: 10px;
+    }
+
+    .meta-label {
+      font-size: 0.73rem;
+      color: var(--muted);
+      display: block;
+    }
+
+    .meta-val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--ink);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-top: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      min-width: 620px;
+    }
+
+    th, td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    th {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      background: var(--surface-subtle);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr.highlight-row td {
+      background: var(--teal-soft);
+      font-weight: 600;
+    }
+
+    .explainer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .explainer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .explainer-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .explainer-box svg {
+      flex-shrink: 0;
+      color: var(--teal);
+      margin-top: 2px;
+    }
+
+    /* Section 4: Pipeline Stepper */
+    .stepper-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stepper-rail {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 960px) {
+      .stepper-rail {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+      }
+    }
+
+    .step-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      overflow: hidden;
+    }
+
+    .step-item.active {
+      border-color: var(--teal);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-trigger {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 16px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--ink);
+      font-family: var(--font-sans);
+    }
+
+    @media (min-width: 960px) {
+      .step-trigger {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        min-height: 112px;
+      }
+    }
+
+    .step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--surface-subtle);
+      color: var(--muted);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    .step-item.active .step-num {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    html[data-theme="dark"] .step-item.active .step-num {
+      color: #08101D;
+    }
+
+    .step-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .step-chevron {
+      color: var(--muted);
+      transition: transform var(--transition);
+    }
+
+    .step-item.active .step-chevron {
+      transform: rotate(180deg);
+      color: var(--teal);
+    }
+
+    @media (min-width: 960px) {
+      .step-chevron {
+        display: none;
+      }
+    }
+
+    .step-mobile-body {
+      display: none;
+      padding: 0 16px 16px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .step-item.active .step-mobile-body {
+      display: block;
+    }
+
+    @media (min-width: 960px) {
+      .step-mobile-body,
+      .step-item.active .step-mobile-body {
+        display: none;
+      }
+    }
+
+    .step-desktop-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    @media (min-width: 960px) {
+      .step-desktop-panel {
+        display: flex;
+      }
+    }
+
+    .step-panel-content {
+      max-width: 760px;
+    }
+
+    .step-panel-title {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-panel-desc {
+      font-size: 1.02rem;
+      color: var(--ink);
+    }
+
+    .step-nav-btns {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .pipeline-note {
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+      border-left: 3px solid var(--teal);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    /* Tabs / Switchers */
+    .tab-bar {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      min-height: 44px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition), color var(--transition), box-shadow var(--transition);
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Section 5: Results */
+    .results-top-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (min-width: 960px) {
+      .results-top-grid {
+        grid-template-columns: 1.15fr 0.85fr;
+      }
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    .grouped-chart-group {
+      margin-bottom: 24px;
+    }
+
+    .grouped-chart-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .grouped-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .grouped-metric-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+
+    .grouped-metric-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .bar-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 88px 1fr 72px;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .bar-model-tag {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .bar-track {
+      height: 16px;
+      background: var(--surface-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1), background-color var(--transition);
+    }
+
+    .bar-val {
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-align: right;
+      color: var(--ink);
+    }
+
+    .callout-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .callout-quote {
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+      background: var(--surface-subtle);
+      border-left: 4px solid var(--teal);
+      font-size: 0.98rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .callout-quote.warn {
+      border-left-color: var(--rose);
+      background: var(--rose-soft);
+    }
+
+    .kpi-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .kpi-mini {
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+    }
+
+    .kpi-mini-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .kpi-mini-val {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .footnote {
+      margin-top: 20px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+    }
+
+    /* Section 6: Fairness */
+    .fairness-bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 12px;
+    }
+
+    .fairness-item {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+    }
+
+    .fairness-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .fairness-group-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--ink);
+    }
+
+    .fairness-group-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* Section 7: Feature Importance */
+    .feature-row {
+      margin-bottom: 16px;
+    }
+
+    .feature-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+
+    .feature-name {
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--surface-subtle);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-score {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    /* Section 8: Route-Planning BFS Demo */
+    .bfs-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 960px) {
+      .bfs-layout {
+        grid-template-columns: 1.45fr 0.85fr;
+      }
+    }
+
+    .bfs-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .select-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px 12px;
+      min-height: 44px;
+    }
+
+    .select-wrap label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .select-wrap select {
+      background: transparent;
+      border: none;
+      color: var(--ink);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      min-height: 36px;
+      cursor: pointer;
+    }
+
+    .bfs-svg-box {
+      width: 100%;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .bfs-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .graph-edge {
+      stroke: var(--border);
+      stroke-width: 2.5;
+      fill: none;
+      transition: stroke 0.35s ease, stroke-width 0.35s ease;
+    }
+
+    .graph-edge.explored {
+      stroke: var(--indigo);
+      stroke-width: 3;
+    }
+
+    .graph-edge.shortest {
+      stroke: var(--teal);
+      stroke-width: 4.5;
+    }
+
+    .graph-node circle {
+      fill: var(--surface);
+      stroke: var(--muted);
+      stroke-width: 2.5;
+      transition: fill 0.35s ease, stroke 0.35s ease, r 0.35s ease;
+    }
+
+    .graph-node.queued circle {
+      stroke: var(--amber);
+      fill: var(--amber-soft);
+    }
+
+    .graph-node.explored circle {
+      stroke: var(--indigo);
+      fill: var(--indigo-soft);
+    }
+
+    .graph-node.shortest circle {
+      stroke: var(--teal);
+      fill: var(--teal);
+    }
+
+    .graph-node text {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      fill: var(--ink);
+      pointer-events: none;
+    }
+
+    .queue-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .queue-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-height: 76px;
+    }
+
+    .queue-box-title {
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .node-chip {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .node-chip.path-chip {
+      background: var(--teal-soft);
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    /* Section 9: Recommendations, Limitations, Future Work */
+    .limit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .limit-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+
+    .limit-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+
+    .future-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .future-chip {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      font-family: var(--font-display);
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .future-chip:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+    }
+
+    /* Tooltip */
+    .chart-tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1200;
+      background: var(--ink);
+      color: var(--bg);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .chart-tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Footer */
+    .site-footer {
+      padding: 56px 0 64px;
+      background: var(--surface);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    @media (min-width: 768px) {
+      .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .authors-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .hero-word {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <div class="chart-tooltip" id="chart-tooltip" role="status" aria-live="polite"></div>
+
+  <!-- Sticky Navigation -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#top" class="brand" aria-label="Household Poverty Prediction Home">
+        <span class="brand-mark">ML</span>
+        <span>Pover-T Targeting</span>
+      </a>
+
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#dataset">Dataset</a></li>
+          <li><a href="#pipeline">Pipeline</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#fairness">Fairness</a></li>
+          <li><a href="#features">Drivers</a></li>
+          <li><a href="#routing">BFS Demo</a></li>
+          <li><a href="#recommendations">Outlook</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle color theme">
+          <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span id="theme-label">Dark</span>
+        </button>
+
+        <button type="button" class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-drawer" aria-label="Open navigation menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-nav-drawer" id="mobile-drawer">
+      <ul class="mobile-nav-list">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#dataset">Dataset</a></li>
+        <li><a href="#pipeline">Pipeline</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#fairness">Fairness</a></li>
+        <li><a href="#features">Drivers</a></li>
+        <li><a href="#routing">BFS Demo</a></li>
+        <li><a href="#recommendations">Outlook</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 1. Hero -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="mesh-blob blob-teal" aria-hidden="true"></div>
+      <div class="mesh-blob blob-indigo" aria-hidden="true"></div>
+
+      <div class="container hero-content">
+        <div class="hero-tag">
+          <span class="hero-tag-dot" aria-hidden="true"></span>
+          <span>DrivenData Pover-T data · CSE 276 Machine Learning</span>
+        </div>
+
+        <h1 class="hero-title" id="hero-heading" aria-label="Household Poverty Prediction for Programme Targeting">
+          <!-- Populated word-by-word via JS with fallback text -->
+          Household Poverty Prediction for Programme Targeting
+        </h1>
+
+        <p class="hero-subtitle">
+          Machine learning that helps social-protection programmes reach the households that need them most.
+        </p>
+
+        <div class="stat-chips" role="list" aria-label="Key project statistics">
+          <div class="stat-chip" role="listitem">
+            <div class="stat-chip-value">
+              <span class="count-up" data-target="3" data-decimals="0">3</span> countries
+            </div>
+            <div class="stat-chip-label">Cross-national evaluation</div>
+          </div>
+
+          <div class="stat-chip" role="listitem">
+            <div class="stat-chip-value">
+              <span class="count-up" data-target="17927" data-decimals="0" data-comma="true">17,927</span> households
+            </div>
+            <div class="stat-chip-label">Combined survey sample</div>
+          </div>
+
+          <div class="stat-chip" role="listitem">
+            <div class="stat-chip-value">
+              <span class="count-up" data-target="0.1801" data-decimals="4">0.1801</span>
+            </div>
+            <div class="stat-chip-label">average log loss (LightGBM)</div>
+          </div>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="#results" class="btn btn-primary">
+            <span>Explore results</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#pipeline" class="btn btn-secondary">
+            <span>See the pipeline</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. The Problem -->
+    <section id="problem" aria-labelledby="problem-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">01 · Motivation</div>
+          <h2 class="section-title" id="problem-heading">The targeting problem</h2>
+          <p class="section-desc">
+            Surveys are expensive and quickly outdated. Proxy Means Test (PMT) rules are linear and hand-crafted. Poor targeting leaves the poor out and wastes budget.
+          </p>
+        </div>
+
+        <div class="problem-lead reveal">
+          <div class="problem-pillar">
+            <div class="pillar-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="pillar-text">
+              <h3>Costly &amp; Outdated Surveys</h3>
+              <p>Full consumption censuses take years to collect and rapidly lose accuracy after economic shocks.</p>
+            </div>
+          </div>
+
+          <div class="problem-pillar">
+            <div class="pillar-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="20" x2="20" y2="4"></line>
+                <circle cx="8" cy="8" r="2"></circle>
+                <circle cx="16" cy="16" r="2"></circle>
+              </svg>
+            </div>
+            <div class="pillar-text">
+              <h3>Rigid Linear PMT Rules</h3>
+              <p>Proxy Means Tests rely on hand-crafted linear weights that miss non-linear household interactions.</p>
+            </div>
+          </div>
+
+          <div class="problem-pillar">
+            <div class="pillar-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="pillar-text">
+              <h3>High Human &amp; Fiscal Cost</h3>
+              <p>Misclassification either denies critical assistance to vulnerable families or leaks scarce programme funds.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <article class="card card-lift error-card exclusion reveal">
+            <div class="error-header">
+              <h3>Exclusion Error</h3>
+              <span class="badge badge-amber">Primary fairness metric</span>
+            </div>
+            <div class="formula-box" aria-label="Exclusion Error equals FN divided by FN plus TP">
+              <span class="formula-lhs">Exclusion Error</span>
+              <span class="formula-rhs">= FN / (FN + TP)</span>
+            </div>
+            <p>
+              A poor household is wrongly denied aid. This is the primary fairness metric.
+            </p>
+          </article>
+
+          <article class="card card-lift error-card inclusion reveal">
+            <div class="error-header">
+              <h3>Inclusion Error</h3>
+              <span class="badge badge-indigo">Budget leakage metric</span>
+            </div>
+            <div class="formula-box" aria-label="Inclusion Error equals FP divided by FP plus TN">
+              <span class="formula-lhs">Inclusion Error</span>
+              <span class="formula-rhs">= FP / (FP + TN)</span>
+            </div>
+            <p>
+              A non-poor household is wrongly included, which causes budget leakage.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Dataset -->
+    <section id="dataset" aria-labelledby="dataset-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">02 · Data Architecture</div>
+          <h2 class="section-title" id="dataset-heading">Multi-country survey dataset</h2>
+          <p class="section-desc">
+            Three distinct national contexts with sharply different poverty rates, sample sizes, and class imbalance profiles.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <!-- Country A Card -->
+          <article class="card card-lift country-donut-card reveal">
+            <div class="donut-top">
+              <div>
+                <span class="badge badge-teal" style="margin-bottom:8px;">Balanced Class Profile</span>
+                <h3>Country A</h3>
+                <p style="font-size:0.86rem;">High baseline poverty rate with mild class weight.</p>
+              </div>
+              <div class="donut-svg-wrap" aria-label="Country A poverty rate 45.1 percent">
+                <svg class="donut-svg" viewBox="0 0 100 100">
+                  <circle class="donut-track" cx="50" cy="50" r="42"></circle>
+                  <circle class="donut-fill" cx="50" cy="50" r="42" data-pct="45.1"></circle>
+                </svg>
+                <div class="donut-center">
+                  <span class="donut-pct">45.1%</span>
+                  <span class="donut-sub">Poor</span>
+                </div>
+              </div>
+            </div>
+            <div class="country-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Households</span>
+                <span class="meta-val count-up" data-target="8203" data-comma="true">8,203</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Individuals</span>
+                <span class="meta-val count-up" data-target="37560" data-comma="true">37,560</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Poor households</span>
+                <span class="meta-val count-up" data-target="3703" data-comma="true">3,703</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Engineered features</span>
+                <span class="meta-val">353</span>
+              </div>
+              <div class="meta-item" style="grid-column: span 2;">
+                <span class="meta-label">Class weight (#non-poor / #poor)</span>
+                <span class="meta-val">1.22</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Country B Card -->
+          <article class="card card-lift country-donut-card reveal">
+            <div class="donut-top">
+              <div>
+                <span class="badge badge-rose" style="margin-bottom:8px;">Severe Imbalance</span>
+                <h3>Country B</h3>
+                <p style="font-size:0.86rem;">High feature dimensionality and only 251 poor households.</p>
+              </div>
+              <div class="donut-svg-wrap" aria-label="Country B poverty rate 7.7 percent">
+                <svg class="donut-svg" viewBox="0 0 100 100">
+                  <circle class="donut-track" cx="50" cy="50" r="42"></circle>
+                  <circle class="donut-fill" cx="50" cy="50" r="42" data-pct="7.7" style="stroke: var(--amber);"></circle>
+                </svg>
+                <div class="donut-center">
+                  <span class="donut-pct">7.7%</span>
+                  <span class="donut-sub">Poor</span>
+                </div>
+              </div>
+            </div>
+            <div class="country-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Households</span>
+                <span class="meta-val count-up" data-target="3255" data-comma="true">3,255</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Individuals</span>
+                <span class="meta-val count-up" data-target="20252" data-comma="true">20,252</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Poor households</span>
+                <span class="meta-val count-up" data-target="251" data-comma="true">251</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Engineered features</span>
+                <span class="meta-val">570</span>
+              </div>
+              <div class="meta-item" style="grid-column: span 2;">
+                <span class="meta-label">Class weight (#non-poor / #poor)</span>
+                <span class="meta-val">11.97</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Country C Card -->
+          <article class="card card-lift country-donut-card reveal">
+            <div class="donut-top">
+              <div>
+                <span class="badge badge-indigo" style="margin-bottom:8px;">Moderate Imbalance</span>
+                <h3>Country C</h3>
+                <p style="font-size:0.86rem;">Compact feature space with strong non-linear separability.</p>
+              </div>
+              <div class="donut-svg-wrap" aria-label="Country C poverty rate 15.0 percent">
+                <svg class="donut-svg" viewBox="0 0 100 100">
+                  <circle class="donut-track" cx="50" cy="50" r="42"></circle>
+                  <circle class="donut-fill" cx="50" cy="50" r="42" data-pct="15.0"></circle>
+                </svg>
+                <div class="donut-center">
+                  <span class="donut-pct">15.0%</span>
+                  <span class="donut-sub">Poor</span>
+                </div>
+              </div>
+            </div>
+            <div class="country-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Households</span>
+                <span class="meta-val count-up" data-target="6469" data-comma="true">6,469</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Individuals</span>
+                <span class="meta-val count-up" data-target="29913" data-comma="true">29,913</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Poor households</span>
+                <span class="meta-val count-up" data-target="973" data-comma="true">973</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Engineered features</span>
+                <span class="meta-val">184</span>
+              </div>
+              <div class="meta-item" style="grid-column: span 2;">
+                <span class="meta-label">Class weight (#non-poor / #poor)</span>
+                <span class="meta-val">5.65</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Complete Summary Table -->
+        <div class="table-wrap reveal" role="region" aria-label="Dataset summary table" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th>Households</th>
+                <th>Individuals</th>
+                <th>Poor households</th>
+                <th>Poverty rate</th>
+                <th>Engineered features</th>
+                <th>Class weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>A</strong></td>
+                <td>8,203</td>
+                <td>37,560</td>
+                <td>3,703</td>
+                <td>45.1%</td>
+                <td>353</td>
+                <td>1.22</td>
+              </tr>
+              <tr>
+                <td><strong>B</strong></td>
+                <td>3,255</td>
+                <td>20,252</td>
+                <td>251</td>
+                <td>7.7%</td>
+                <td>570</td>
+                <td>11.97</td>
+              </tr>
+              <tr>
+                <td><strong>C</strong></td>
+                <td>6,469</td>
+                <td>29,913</td>
+                <td>973</td>
+                <td>15.0%</td>
+                <td>184</td>
+                <td>5.65</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Two Short Explainers -->
+        <div class="explainer-grid reveal">
+          <div class="explainer-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <div>
+              <h3 style="font-size:0.95rem; margin-bottom:2px;">Relational Survey Structure</h3>
+              <p style="font-size:0.88rem;">A household file (housing, location, target "poor") plus an individual file (one row per person).</p>
+            </div>
+          </div>
+
+          <div class="explainer-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <div>
+              <h3 style="font-size:0.95rem; margin-bottom:2px;">Privacy-Preserving Schema</h3>
+              <p style="font-size:0.88rem;">Feature names are anonymised.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Pipeline -->
+    <section id="pipeline" aria-labelledby="pipeline-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">03 · Methodology</div>
+          <h2 class="section-title" id="pipeline-heading">End-to-end modelling pipeline</h2>
+          <p class="section-desc">
+            Select any stage below to inspect the data transformations, model hyperparameters, and calibration rules.
+          </p>
+        </div>
+
+        <div class="stepper-container reveal">
+          <div class="stepper-rail" id="stepper-rail" role="tablist" aria-label="Modelling pipeline steps">
+            <!-- Populated and enhanced by JS, with static accessible markup -->
+            <div class="step-item active" data-step="0">
+              <button type="button" class="step-trigger" role="tab" aria-selected="true" aria-controls="step-panel">
+                <span class="step-num">1</span>
+                <span class="step-label">Load CSVs</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">Load household and individual CSVs.</div>
+            </div>
+
+            <div class="step-item" data-step="1">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">2</span>
+                <span class="step-label">Aggregate</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">Aggregate individual numeric columns to household level (mean, min, max, sum) and add hh_size.</div>
+            </div>
+
+            <div class="step-item" data-step="2">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">3</span>
+                <span class="step-label">Impute &amp; Encode</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">Impute with column means (then -999), and LabelEncode categoricals.</div>
+            </div>
+
+            <div class="step-item" data-step="3">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">4</span>
+                <span class="step-label">PMT Baseline</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">PMT baseline: Logistic Regression (max_iter 1000) on StandardScaler features, 0.5 cutoff.</div>
+            </div>
+
+            <div class="step-item" data-step="4">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">5</span>
+                <span class="step-label">LightGBM</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">LightGBM: learning_rate 0.05, max_depth 6, num_leaves 31, feature_fraction 0.8, up to 1000 rounds with early stopping at 50, and scale_pos_weight = #non-poor/#poor.</div>
+            </div>
+
+            <div class="step-item" data-step="5">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">6</span>
+                <span class="step-label">Dynamic Cutoff</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">Dynamic threshold: Percentile(OOF_Preds, (1 − poverty_rate) × 100), so the share predicted poor matches the observed poverty rate.</div>
+            </div>
+
+            <div class="step-item" data-step="6">
+              <button type="button" class="step-trigger" role="tab" aria-selected="false" aria-controls="step-panel">
+                <span class="step-num">7</span>
+                <span class="step-label">Evaluate</span>
+                <svg class="step-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="step-mobile-body">Evaluate: Log Loss, ROC-AUC, accuracy, F1, exclusion and inclusion error, and household-size subgroups.</div>
+            </div>
+          </div>
+
+          <div class="step-desktop-panel" id="step-panel" role="tabpanel" aria-live="polite">
+            <div class="step-panel-content">
+              <div class="step-panel-title">
+                <span class="badge badge-teal" id="step-panel-badge">Step 1 of 7</span>
+                <h3 id="step-panel-heading">Load CSVs</h3>
+              </div>
+              <p class="step-panel-desc" id="step-panel-text">
+                Load household and individual CSVs.
+              </p>
+            </div>
+            <div class="step-nav-btns">
+              <button type="button" class="icon-btn" id="step-prev" aria-label="Previous pipeline step">Prev</button>
+              <button type="button" class="icon-btn" id="step-next" aria-label="Next pipeline step">Next</button>
+            </div>
+          </div>
+
+          <div class="pipeline-note">
+            Stratified 5-fold CV (random_state 42), per country. All metrics are out-of-fold.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Results (The Centrepiece) -->
+    <section id="results" aria-labelledby="results-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">04 · Empirical Evaluation</div>
+          <h2 class="section-title" id="results-heading">Model performance &amp; targeting errors</h2>
+          <p class="section-desc">
+            Comparing the linear PMT baseline against gradient-boosted trees across probability calibration, ranking power, and programme targeting errors.
+          </p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar reveal" role="tablist" aria-label="Results by country">
+          <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-results-tab="A">Country A</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-results-tab="B">Country B</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-results-tab="C">Country C</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-results-tab="Average">Overall</button>
+        </div>
+
+        <!-- Interactive Chart + Callout Panel -->
+        <div class="results-top-grid reveal">
+          <div class="card">
+            <div class="chart-legend">
+              <span class="legend-item">
+                <span class="legend-swatch" style="background: var(--indigo);"></span>
+                <span>PMT Baseline (Indigo)</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-swatch" style="background: var(--teal);"></span>
+                <span>LightGBM (Teal)</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-swatch" style="background: var(--amber);"></span>
+                <span>Exclusion Error (Amber)</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-swatch" style="background: var(--rose);"></span>
+                <span>Worst-case (Rose)</span>
+              </span>
+            </div>
+
+            <!-- Grouped Bar 1: ROC-AUC -->
+            <div class="grouped-chart-group">
+              <div class="grouped-label-row">
+                <span class="grouped-metric-name">ROC-AUC</span>
+                <span class="grouped-metric-hint">Higher is better</span>
+              </div>
+              <div class="bar-pair">
+                <div class="bar-row" data-tooltip-label="PMT ROC-AUC">
+                  <span class="bar-model-tag">PMT</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-auc-pmt" style="background: var(--indigo);"></div>
+                  </div>
+                  <span class="bar-val" id="val-auc-pmt">0.9462</span>
+                </div>
+                <div class="bar-row" data-tooltip-label="LightGBM ROC-AUC">
+                  <span class="bar-model-tag">LightGBM</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-auc-lgb" style="background: var(--teal);"></div>
+                  </div>
+                  <span class="bar-val" id="val-auc-lgb">0.9504</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grouped Bar 2: Log Loss -->
+            <div class="grouped-chart-group">
+              <div class="grouped-label-row">
+                <span class="grouped-metric-name">Log Loss</span>
+                <span class="grouped-metric-hint">Lower is better</span>
+              </div>
+              <div class="bar-pair">
+                <div class="bar-row" data-tooltip-label="PMT Log Loss">
+                  <span class="bar-model-tag">PMT</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-ll-pmt" style="background: var(--indigo);"></div>
+                  </div>
+                  <span class="bar-val" id="val-ll-pmt">0.3048</span>
+                </div>
+                <div class="bar-row" data-tooltip-label="LightGBM Log Loss">
+                  <span class="bar-model-tag">LightGBM</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-ll-lgb" style="background: var(--teal);"></div>
+                  </div>
+                  <span class="bar-val" id="val-ll-lgb">0.2827</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grouped Bar 3: Exclusion Error -->
+            <div class="grouped-chart-group" id="exclusion-chart-block">
+              <div class="grouped-label-row">
+                <span class="grouped-metric-name">Exclusion Error</span>
+                <span class="grouped-metric-hint" id="exclusion-chart-hint">Lower is fairer · FN/(FN+TP)</span>
+              </div>
+              <div class="bar-pair">
+                <div class="bar-row" data-tooltip-label="PMT Exclusion Error">
+                  <span class="bar-model-tag">PMT</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-excl-pmt" style="background: var(--indigo);"></div>
+                  </div>
+                  <span class="bar-val" id="val-excl-pmt">14.07%</span>
+                </div>
+                <div class="bar-row" data-tooltip-label="LightGBM Exclusion Error">
+                  <span class="bar-model-tag">LightGBM</span>
+                  <div class="bar-track">
+                    <div class="bar-fill" id="bar-excl-lgb" style="background: var(--amber);"></div>
+                  </div>
+                  <span class="bar-val" id="val-excl-lgb">14.26%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Callout & Country Snapshot -->
+          <div class="card callout-card">
+            <div>
+              <span class="badge badge-teal" id="results-country-badge" style="margin-bottom:10px;">Country A Assessment</span>
+              <h3 id="results-callout-title" style="margin-bottom:12px;">Honest country callout</h3>
+              <div class="callout-quote" id="results-callout-box">
+                Nearly tied with PMT: most of the signal is linear.
+              </div>
+            </div>
+
+            <div class="kpi-mini-grid">
+              <div class="kpi-mini">
+                <div class="kpi-mini-label">Dynamic Threshold</div>
+                <div class="kpi-mini-val" id="kpi-threshold">0.5336</div>
+              </div>
+              <div class="kpi-mini">
+                <div class="kpi-mini-label">LGB / PMT Accuracy</div>
+                <div class="kpi-mini-val" id="kpi-acc">87.13% / 87.10%</div>
+              </div>
+              <div class="kpi-mini">
+                <div class="kpi-mini-label">LGB / PMT F1 Score</div>
+                <div class="kpi-mini-val" id="kpi-f1">0.8574 / 0.8575</div>
+              </div>
+              <div class="kpi-mini">
+                <div class="kpi-mini-label">LGB / PMT Inclusion</div>
+                <div class="kpi-mini-val" id="kpi-incl">11.73% / 11.93%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Metrics Table -->
+        <h3 style="font-size:1.05rem; margin-bottom:12px;" class="reveal">Out-of-fold classification &amp; ranking metrics</h3>
+        <div class="table-wrap reveal" style="margin-top:0; margin-bottom:28px;" role="region" aria-label="Classification metrics table" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th>LightGBM Log Loss</th>
+                <th>PMT Log Loss</th>
+                <th>AUC LightGBM</th>
+                <th>AUC PMT</th>
+                <th>Threshold</th>
+                <th>LGB Acc</th>
+                <th>LGB F1</th>
+                <th>PMT Acc</th>
+                <th>PMT F1</th>
+              </tr>
+            </thead>
+            <tbody id="metrics-table-body">
+              <tr data-row="A" class="highlight-row">
+                <td><strong>A</strong></td>
+                <td style="color:var(--teal); font-weight:700;">0.2827</td>
+                <td>0.3048</td>
+                <td style="color:var(--teal); font-weight:700;">0.9504</td>
+                <td>0.9462</td>
+                <td>0.5336</td>
+                <td>87.13%</td>
+                <td>0.8574</td>
+                <td>87.10%</td>
+                <td>0.8575</td>
+              </tr>
+              <tr data-row="B">
+                <td><strong>B</strong></td>
+                <td style="color:var(--teal); font-weight:700;">0.2387</td>
+                <td style="color:var(--rose); font-weight:700;">0.6865</td>
+                <td>0.7750</td>
+                <td style="color:var(--indigo); font-weight:700;">0.7896</td>
+                <td>0.2156</td>
+                <td>89.12%</td>
+                <td>0.2948</td>
+                <td>87.90%</td>
+                <td>0.2989</td>
+              </tr>
+              <tr data-row="C">
+                <td><strong>C</strong></td>
+                <td style="color:var(--teal); font-weight:700;">0.0190</td>
+                <td>0.1852</td>
+                <td style="color:var(--teal); font-weight:700;">0.9988</td>
+                <td>0.9566</td>
+                <td>0.3382</td>
+                <td style="color:var(--teal); font-weight:700;">99.44%</td>
+                <td style="color:var(--teal); font-weight:700;">0.9815</td>
+                <td>91.73%</td>
+                <td>0.6972</td>
+              </tr>
+              <tr data-row="Average">
+                <td><strong>Average</strong></td>
+                <td style="color:var(--teal); font-weight:700;">0.1801</td>
+                <td>0.3922</td>
+                <td style="color:var(--teal); font-weight:700;">0.9081</td>
+                <td>0.8975</td>
+                <td>n/a</td>
+                <td style="color:var(--teal); font-weight:700;">91.90%</td>
+                <td style="color:var(--teal); font-weight:700;">0.7112</td>
+                <td>88.91%</td>
+                <td>0.6179</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Targeting Errors Table -->
+        <h3 style="font-size:1.05rem; margin-bottom:12px;" class="reveal">Programme targeting errors</h3>
+        <div class="table-wrap reveal" style="margin-top:0;" role="region" aria-label="Targeting errors table" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th>PMT Exclusion</th>
+                <th>LGB Exclusion</th>
+                <th>PMT Inclusion</th>
+                <th>LGB Inclusion</th>
+              </tr>
+            </thead>
+            <tbody id="errors-table-body">
+              <tr data-row="A" class="highlight-row">
+                <td><strong>A</strong></td>
+                <td>14.07%</td>
+                <td>14.26%</td>
+                <td>11.93%</td>
+                <td>11.73%</td>
+              </tr>
+              <tr data-row="B">
+                <td><strong>B</strong></td>
+                <td style="color:var(--rose); font-weight:700;">66.53%</td>
+                <td style="color:var(--rose); font-weight:700;">70.52%</td>
+                <td>7.56%</td>
+                <td>5.89%</td>
+              </tr>
+              <tr data-row="C">
+                <td><strong>C</strong></td>
+                <td>36.69%</td>
+                <td style="color:var(--teal); font-weight:700;">1.85%</td>
+                <td>3.24%</td>
+                <td style="color:var(--teal); font-weight:700;">0.33%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="footnote reveal">
+          PMT uses a fixed 0.5 cutoff and LightGBM uses the poverty-rate threshold, so error rates are not like-for-like. AUC and log loss are the fairer comparison.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. Who gets left out? (Fairness) -->
+    <section id="fairness" aria-labelledby="fairness-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">05 · Subgroup Audit</div>
+          <h2 class="section-title" id="fairness-heading">Who gets left out?</h2>
+          <p class="section-desc">
+            Disaggregating LightGBM exclusion error across household size subgroups reveals systematic under-coverage of smaller households.
+          </p>
+        </div>
+
+        <div class="tab-bar reveal" role="tablist" aria-label="Fairness audit country switcher">
+          <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-fairness-tab="A">Country A</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-fairness-tab="B">Country B</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-fairness-tab="C">Country C</button>
+        </div>
+
+        <div class="grid-2 reveal">
+          <!-- Animated Subgroup Bar Chart -->
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 id="fairness-chart-title">Country A · Exclusion Error by Household Size</h3>
+              <span class="badge badge-amber">FN / (FN + TP)</span>
+            </div>
+
+            <div class="fairness-bar-list">
+              <!-- Small -->
+              <div class="fairness-item">
+                <div class="fairness-item-head">
+                  <span class="fairness-group-title">Small (1–2)</span>
+                  <span class="fairness-group-sub" id="fair-sub-small">244 poor, 16.8% of group</span>
+                </div>
+                <div class="bar-row" style="grid-template-columns: 1fr 78px;">
+                  <div class="bar-track">
+                    <div class="bar-fill" id="fair-bar-small" style="background: var(--amber);"></div>
+                  </div>
+                  <span class="bar-val" id="fair-val-small">34.84%</span>
+                </div>
+              </div>
+
+              <!-- Medium -->
+              <div class="fairness-item">
+                <div class="fairness-item-head">
+                  <span class="fairness-group-title">Medium (3–5)</span>
+                  <span class="fairness-group-sub" id="fair-sub-med">1,843 poor, 44.4%</span>
+                </div>
+                <div class="bar-row" style="grid-template-columns: 1fr 78px;">
+                  <div class="bar-track">
+                    <div class="bar-fill" id="fair-bar-med" style="background: var(--amber);"></div>
+                  </div>
+                  <span class="bar-val" id="fair-val-med">14.87%</span>
+                </div>
+              </div>
+
+              <!-- Large -->
+              <div class="fairness-item">
+                <div class="fairness-item-head">
+                  <span class="fairness-group-title">Large (6+)</span>
+                  <span class="fairness-group-sub" id="fair-sub-large">1,616 poor, 62.2%</span>
+                </div>
+                <div class="bar-row" style="grid-template-columns: 1fr 78px;">
+                  <div class="bar-track">
+                    <div class="bar-fill" id="fair-bar-large" style="background: var(--amber);"></div>
+                  </div>
+                  <span class="bar-val" id="fair-val-large">10.46%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insight Card -->
+          <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; gap:20px;">
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+                <h3>Disparity Analysis</h3>
+                <span class="badge badge-amber">Hypothesis, not a proven cause</span>
+              </div>
+
+              <ul class="limit-list">
+                <li>
+                  <span class="limit-dot" aria-hidden="true"></span>
+                  <span>Small households are excluded most in A and C. In C the rate is about 5x that of other groups.</span>
+                </li>
+                <li>
+                  <span class="limit-dot" aria-hidden="true"></span>
+                  <span>They also have the lowest poverty rate and fewer records to aggregate.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div style="padding:18px 20px; border-radius:var(--radius-md); background:var(--teal-soft); border:1px solid var(--teal);">
+              <div style="font-family:var(--font-display); font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--teal); margin-bottom:4px;">
+                Policy &amp; Modelling Recommendation
+              </div>
+              <p style="color:var(--ink); font-weight:600; font-size:0.95rem;">
+                Use lower or group-specific thresholds for small households.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Complete Fairness Reference Table -->
+        <div class="table-wrap reveal" role="region" aria-label="Exclusion error by household size table" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th>Small (1–2)</th>
+                <th>Medium (3–5)</th>
+                <th>Large (6+)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>A</strong></td>
+                <td><strong style="color:var(--amber);">34.84%</strong> (244 poor, 16.8% of group)</td>
+                <td>14.87% (1,843 poor, 44.4%)</td>
+                <td>10.46% (1,616 poor, 62.2%)</td>
+              </tr>
+              <tr>
+                <td><strong>B</strong></td>
+                <td>N/A (0 poor of 203 households)</td>
+                <td><strong style="color:var(--rose);">69.23%</strong> (65 poor, 5.4%)</td>
+                <td><strong style="color:var(--rose);">70.81%</strong> (185 poor, 10.1%)</td>
+              </tr>
+              <tr>
+                <td><strong>C</strong></td>
+                <td><strong style="color:var(--amber);">8.11%</strong> (37 poor, 2.0%)</td>
+                <td>1.70% (294 poor, 11.6%)</td>
+                <td>1.57% (637 poor, 30.7%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. What drives the predictions -->
+    <section id="features" aria-labelledby="features-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">06 · Interpretability</div>
+          <h2 class="section-title" id="features-heading">What drives the predictions</h2>
+          <p class="section-desc">
+            Top 5 features per country ranked by LightGBM split count averaged over 5 folds.
+          </p>
+        </div>
+
+        <div class="tab-bar reveal" role="tablist" aria-label="Feature importance country switcher">
+          <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-feat-tab="A">Country A</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-feat-tab="B">Country B</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-feat-tab="C">Country C</button>
+        </div>
+
+        <div class="grid-2 reveal">
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <h3 id="feat-chart-title">Country A · Top 5 Features</h3>
+              <span class="badge badge-teal">Mean split count (5 folds)</span>
+            </div>
+            <div id="feature-bars-container">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; justify-content:center; gap:16px;">
+            <h3>Key takeaways</h3>
+            <div class="explainer-box" style="background:var(--surface-subtle);">
+              <span class="badge badge-teal">A</span>
+              <p style="color:var(--ink); font-weight:500; font-size:0.92rem;">
+                <code>hh_size</code> is the 4th feature in A.
+              </p>
+            </div>
+            <div class="explainer-box" style="background:var(--surface-subtle);">
+              <span class="badge badge-rose">B</span>
+              <p style="color:var(--ink); font-weight:500; font-size:0.92rem;">
+                B's importances are almost flat, which matches its weak AUC.
+              </p>
+            </div>
+            <div class="explainer-box" style="background:var(--surface-subtle);">
+              <span class="badge badge-amber">C</span>
+              <p style="color:var(--ink); font-weight:500; font-size:0.92rem;">
+                C is dominated by one feature, so check it does not leak the target.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Route-planning demo (interactive) -->
+    <section id="routing" aria-labelledby="routing-heading">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">07 · Last-Mile Delivery</div>
+          <h2 class="section-title" id="routing-heading">Route-planning demo</h2>
+          <p class="section-desc">
+            Once target zones are identified, field teams need minimum-hop dispatch routes from headquarters to target communities.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <div class="bfs-controls">
+            <div class="select-wrap">
+              <label for="bfs-goal">Goal:</label>
+              <select id="bfs-goal" aria-label="Select target zone goal">
+                <option value="Target_Zone_Alpha">Target_Zone_Alpha</option>
+                <option value="Target_Zone_Beta">Target_Zone_Beta</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="bfs-run-btn" style="min-height:44px; padding:0 18px;">
+              <span>Run BFS</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="bfs-reset-btn" style="min-height:44px; padding:0 16px;">
+              <span>Reset</span>
+            </button>
+
+            <span id="bfs-status-badge" class="badge badge-teal" style="margin-left:auto;">Ready to run</span>
+          </div>
+
+          <div class="bfs-layout">
+            <div class="bfs-svg-box">
+              <svg class="bfs-svg" viewBox="0 0 680 320" role="img" aria-label="Directed network graph from HQ through Districts and Communities to Target Zones Alpha and Beta">
+                <!-- Directed Edges -->
+                <g id="bfs-edges">
+                  <line id="edge-HQ-District_A" class="graph-edge" x1="75" y1="160" x2="225" y2="90"></line>
+                  <line id="edge-HQ-District_B" class="graph-edge" x1="75" y1="160" x2="225" y2="230"></line>
+                  <line id="edge-District_A-Community_1" class="graph-edge" x1="225" y1="90" x2="405" y2="55"></line>
+                  <line id="edge-District_A-Community_2" class="graph-edge" x1="225" y1="90" x2="405" y2="155"></line>
+                  <line id="edge-District_B-Community_3" class="graph-edge" x1="225" y1="230" x2="405" y2="255"></line>
+                  <line id="edge-Community_1-Target_Zone_Alpha" class="graph-edge" x1="405" y1="55" x2="585" y2="95"></line>
+                  <line id="edge-Community_2-Target_Zone_Beta" class="graph-edge" x1="405" y1="155" x2="585" y2="225"></line>
+                  <line id="edge-Community_3-Target_Zone_Alpha" class="graph-edge" x1="405" y1="255" x2="585" y2="95"></line>
+                </g>
+
+                <!-- Nodes -->
+                <g id="bfs-nodes">
+                  <g class="graph-node" id="node-HQ" transform="translate(75, 160)">
+                    <circle r="22"></circle>
+                    <text dy="38" text-anchor="middle">HQ</text>
+                  </g>
+                  <g class="graph-node" id="node-District_A" transform="translate(225, 90)">
+                    <circle r="22"></circle>
+                    <text dy="-30" text-anchor="middle">District_A</text>
+                  </g>
+                  <g class="graph-node" id="node-District_B" transform="translate(225, 230)">
+                    <circle r="22"></circle>
+                    <text dy="38" text-anchor="middle">District_B</text>
+                  </g>
+                  <g class="graph-node" id="node-Community_1" transform="translate(405, 55)">
+                    <circle r="22"></circle>
+                    <text dy="-28" text-anchor="middle">Community_1</text>
+                  </g>
+                  <g class="graph-node" id="node-Community_2" transform="translate(405, 155)">
+                    <circle r="22"></circle>
+                    <text dy="-28" text-anchor="middle">Community_2</text>
+                  </g>
+                  <g class="graph-node" id="node-Community_3" transform="translate(405, 255)">
+                    <circle r="22"></circle>
+                    <text dy="38" text-anchor="middle">Community_3</text>
+                  </g>
+                  <g class="graph-node" id="node-Target_Zone_Alpha" transform="translate(585, 95)">
+                    <circle r="24"></circle>
+                    <text dy="-32" text-anchor="middle">Target_Zone_Alpha</text>
+                  </g>
+                  <g class="graph-node" id="node-Target_Zone_Beta" transform="translate(585, 225)">
+                    <circle r="24"></circle>
+                    <text dy="40" text-anchor="middle">Target_Zone_Beta</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+
+            <div class="queue-panel">
+              <div class="queue-box">
+                <div class="queue-box-title">Live FIFO Queue</div>
+                <div class="chip-list" id="bfs-queue-list">
+                  <span style="font-size:0.84rem; color:var(--muted);">Click "Run BFS" to start traversal.</span>
+                </div>
+              </div>
+
+              <div class="queue-box">
+                <div class="queue-box-title">Explored Nodes (<span id="bfs-explored-count">0</span>)</div>
+                <div class="chip-list" id="bfs-explored-list"></div>
+              </div>
+
+              <div class="queue-box">
+                <div class="queue-box-title">Minimum-Hop Path</div>
+                <div class="chip-list" id="bfs-path-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <p class="footnote" style="margin-top:20px;">
+            Illustrative network, not derived from the survey data. BFS finds the minimum-hop route, O(V+E).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Recommendations, limitations and future work -->
+    <section id="recommendations" aria-labelledby="rec-heading" style="border-bottom:none;">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="eyebrow">08 · Synthesis &amp; Critical Reflection</div>
+          <h2 class="section-title" id="rec-heading">Recommendations, limitations and future work</h2>
+          <p class="section-desc">
+            Translating empirical findings into actionable deployment guidance while transparently documenting methodological constraints.
+          </p>
+        </div>
+
+        <!-- Three Recommendation Cards -->
+        <div class="grid-3" style="margin-bottom:32px;">
+          <article class="card card-lift reveal">
+            <span class="badge badge-teal" style="margin-bottom:12px;">01 · Fairness Calibration</span>
+            <h3 style="margin-bottom:8px;">Subgroup Thresholding</h3>
+            <p>Lower thresholds for small households.</p>
+          </article>
+
+          <article class="card card-lift reveal">
+            <span class="badge badge-amber" style="margin-bottom:12px;">02 · Cutoff Caveat</span>
+            <h3 style="margin-bottom:8px;">Percentile Calibration</h3>
+            <p>Use poverty-rate percentile thresholds, but note that they don't guarantee low exclusion (see Country B).</p>
+          </article>
+
+          <article class="card card-lift reveal">
+            <span class="badge badge-rose" style="margin-bottom:12px;">03 · Data &amp; Survey Design</span>
+            <h3 style="margin-bottom:8px;">Country B Remediation</h3>
+            <p>Country B needs more poor-household data, better survey questions and budget-based thresholds.</p>
+          </article>
+        </div>
+
+        <div class="grid-2 reveal">
+          <!-- Limitations List -->
+          <div class="card">
+            <h3 style="margin-bottom:16px;">Methodological limitations</h3>
+            <ul class="limit-list">
+              <li>
+                <span class="limit-dot" aria-hidden="true"></span>
+                <span>No held-out test set.</span>
+              </li>
+              <li>
+                <span class="limit-dot" aria-hidden="true"></span>
+                <span>Imputation and scaler fitted before cross-validation (mild leakage).</span>
+              </li>
+              <li>
+                <span class="limit-dot" aria-hidden="true"></span>
+                <span>Unequal PMT and LightGBM cutoffs.</span>
+              </li>
+              <li>
+                <span class="limit-dot" aria-hidden="true"></span>
+                <span>Only 251 poor households in Country B.</span>
+              </li>
+              <li>
+                <span class="limit-dot" aria-hidden="true"></span>
+                <span>Fairness audited only by household size.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Future Work Chips -->
+          <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <h3 style="margin-bottom:10px;">Future work</h3>
+              <p style="font-size:0.92rem;">
+                Next steps to harden validation rigor, model interpretability, and policy alignment:
+              </p>
+              <div class="future-chips" role="list" aria-label="Future work areas">
+                <span class="future-chip" role="listitem">Optuna tuning</span>
+                <span class="future-chip" role="listitem">Model stacking</span>
+                <span class="future-chip" role="listitem">SHAP explanations</span>
+                <span class="future-chip" role="listitem">Wider fairness audit</span>
+                <span class="future-chip" role="listitem">Held-out evaluation</span>
+                <span class="future-chip" role="listitem">Cost-sensitive thresholds</span>
+              </div>
+            </div>
+
+            <div class="footnote" style="margin-top:24px;">
+              All numbers and findings reflect out-of-fold 5-fold stratified cross-validation on DrivenData Pover-T survey tables.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 10. Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <div style="font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--ink);">
+          CSE 276 · Lovely Professional University
+        </div>
+        <div class="authors-list" aria-label="Project authors">
+          <span>Karanjot Singh Jaswal</span>
+          <span style="color:var(--muted);">·</span>
+          <span>Jobanpreet Singh</span>
+        </div>
+      </div>
+
+      <div class="chip-list" aria-label="Technology stack">
+        <span class="node-chip">Python</span>
+        <span class="node-chip">LightGBM</span>
+        <span class="node-chip">scikit-learn</span>
+        <span class="node-chip">pandas</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ==========================================
+       * 1. Theme Toggle (In-Memory Only)
+       * ========================================== */
+      let currentTheme = 'light';
+      const htmlEl = document.documentElement;
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+      const themeLabel = document.getElementById('theme-label');
+
+      function applyTheme(theme) {
+        currentTheme = theme;
+        htmlEl.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+          themeLabel.textContent = 'Light';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+          themeLabel.textContent = 'Dark';
+        }
+      }
+
+      themeToggleBtn.addEventListener('click', () => {
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+      });
+
+      /* ==========================================
+       * 2. Mobile Menu Drawer
+       * ========================================== */
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileDrawer = document.getElementById('mobile-drawer');
+
+      mobileMenuBtn.addEventListener('click', () => {
+        const isOpen = mobileDrawer.classList.toggle('open');
+        mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      mobileDrawer.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileDrawer.classList.remove('open');
+          mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      /* ==========================================
+       * 3. Hero Word-by-Word Fade Up & Node Canvas
+       * ========================================== */
+      const heroHeading = document.getElementById('hero-heading');
+      const rawTitle = 'Household Poverty Prediction for Programme Targeting';
+      if (!prefersReducedMotion && heroHeading) {
+        heroHeading.innerHTML = '';
+        rawTitle.split(' ').forEach((word, idx) => {
+          const span = document.createElement('span');
+          span.className = 'hero-word';
+          span.textContent = word;
+          span.style.animationDelay = `${idx * 90}ms`;
+          heroHeading.appendChild(span);
+        });
+      }
+
+      // Faint animated node-network canvas
+      const canvas = document.getElementById('hero-canvas');
+      if (canvas && !prefersReducedMotion) {
+        const ctx = canvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+        const nodes = [];
+        const NODE_COUNT = 28;
+
+        function resizeCanvas() {
+          width = canvas.width = canvas.parentElement.offsetWidth;
+          height = canvas.height = canvas.parentElement.offsetHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        for (let i = 0; i < NODE_COUNT; i++) {
+          nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: (Math.random() - 0.5) * 0.35,
+            r: 2 + Math.random() * 2
+          });
+        }
+
+        function drawNetwork() {
+          ctx.clearRect(0, 0, width, height);
+          const isDark = currentTheme === 'dark';
+          const dotColor = isDark ? 'rgba(45, 212, 191, 0.35)' : 'rgba(13, 148, 136, 0.28)';
+          const lineColor = isDark ? 'rgba(129, 140, 248, 0.12)' : 'rgba(79, 70, 229, 0.10)';
+
+          for (let i = 0; i < nodes.length; i++) {
+            const n = nodes[i];
+            n.x += n.vx;
+            n.y += n.vy;
+            if (n.x < 0 || n.x > width) n.vx *= -1;
+            if (n.y < 0 || n.y > height) n.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = dotColor;
+            ctx.fill();
+
+            for (let j = i + 1; j < nodes.length; j++) {
+              const m = nodes[j];
+              const dx = n.x - m.x;
+              const dy = n.y - m.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 155) {
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(m.x, m.y);
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(drawNetwork);
+        }
+        requestAnimationFrame(drawNetwork);
+      }
+
+      /* ==========================================
+       * 4. Scroll Progress & Active Section Spy
+       * ========================================== */
+      const progressBar = document.getElementById('scroll-progress');
+      const sections = document.querySelectorAll('main section[id]');
+      const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-list a');
+
+      function onScroll() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+        progressBar.style.width = `${pct}%`;
+
+        let currentSectionId = '';
+        sections.forEach(sec => {
+          const top = sec.offsetTop - 130;
+          if (scrollTop >= top) {
+            currentSectionId = sec.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === `#${currentSectionId}`) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ==========================================
+       * 5. IntersectionObserver: Reveal, Count-up, Donuts
+       * ========================================== */
+      function animateCountUp(el) {
+        if (el.dataset.counted === 'true') return;
+        el.dataset.counted = 'true';
+
+        const target = parseFloat(el.dataset.target);
+        const decimals = parseInt(el.dataset.decimals || '0', 10);
+        const useComma = el.dataset.comma === 'true';
+
+        if (prefersReducedMotion) {
+          el.textContent = formatNumber(target, decimals, useComma);
+          return;
+        }
+
+        const duration = 1100;
+        const startTime = performance.now();
+
+        function tick(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(1, elapsed / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = target * eased;
+          el.textContent = formatNumber(current, decimals, useComma);
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = formatNumber(target, decimals, useComma);
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function formatNumber(num, decimals, useComma) {
+        const fixed = num.toFixed(decimals);
+        if (!useComma) return fixed;
+        return Number(fixed).toLocaleString('en-US', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        });
+      }
+
+      function animateDonut(circle) {
+        if (circle.dataset.animated === 'true') return;
+        circle.dataset.animated = 'true';
+        const pct = parseFloat(circle.dataset.pct || '0');
+        const circumference = 2 * Math.PI * 42; // 263.89
+        const offset = circumference * (1 - pct / 100);
+        circle.style.strokeDashoffset = String(offset);
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            entry.target.querySelectorAll('.count-up').forEach(animateCountUp);
+            entry.target.querySelectorAll('.donut-fill').forEach(animateDonut);
+          }
+        });
+      }, { threshold: 0.14 });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      document.querySelectorAll('.hero .count-up').forEach(animateCountUp);
+
+      /* ==========================================
+       * 6. Pipeline Interactive Stepper
+       * ========================================== */
+      const pipelineSteps = [
+        {
+          title: 'Load CSVs',
+          desc: 'Load household and individual CSVs.'
+        },
+        {
+          title: 'Aggregate',
+          desc: 'Aggregate individual numeric columns to household level (mean, min, max, sum) and add hh_size.'
+        },
+        {
+          title: 'Impute & Encode',
+          desc: 'Impute with column means (then -999), and LabelEncode categoricals.'
+        },
+        {
+          title: 'PMT Baseline',
+          desc: 'PMT baseline: Logistic Regression (max_iter 1000) on StandardScaler features, 0.5 cutoff.'
+        },
+        {
+          title: 'LightGBM',
+          desc: 'LightGBM: learning_rate 0.05, max_depth 6, num_leaves 31, feature_fraction 0.8, up to 1000 rounds with early stopping at 50, and scale_pos_weight = #non-poor/#poor.'
+        },
+        {
+          title: 'Dynamic Cutoff',
+          desc: 'Dynamic threshold: Percentile(OOF_Preds, (1 − poverty_rate) × 100), so the share predicted poor matches the observed poverty rate.'
+        },
+        {
+          title: 'Evaluate',
+          desc: 'Evaluate: Log Loss, ROC-AUC, accuracy, F1, exclusion and inclusion error, and household-size subgroups.'
+        }
+      ];
+
+      let activeStepIdx = 0;
+      const stepItems = document.querySelectorAll('.step-item');
+      const stepBadge = document.getElementById('step-panel-badge');
+      const stepHeading = document.getElementById('step-panel-heading');
+      const stepText = document.getElementById('step-panel-text');
+      const stepPrevBtn = document.getElementById('step-prev');
+      const stepNextBtn = document.getElementById('step-next');
+
+      function setPipelineStep(index) {
+        activeStepIdx = (index + pipelineSteps.length) % pipelineSteps.length;
+        stepItems.forEach((item, idx) => {
+          const isCurrent = idx === activeStepIdx;
+          item.classList.toggle('active', isCurrent);
+          const btn = item.querySelector('.step-trigger');
+          if (btn) btn.setAttribute('aria-selected', String(isCurrent));
+        });
+        const data = pipelineSteps[activeStepIdx];
+        stepBadge.textContent = `Step ${activeStepIdx + 1} of 7`;
+        stepHeading.textContent = data.title;
+        stepText.textContent = data.desc;
+      }
+
+      stepItems.forEach((item, idx) => {
+        const trigger = item.querySelector('.step-trigger');
+        trigger.addEventListener('click', () => setPipelineStep(idx));
+      });
+
+      stepPrevBtn.addEventListener('click', () => setPipelineStep(activeStepIdx - 1));
+      stepNextBtn.addEventListener('click', () => setPipelineStep(activeStepIdx + 1));
+
+      /* ==========================================
+       * 7. Results Tabs & Grouped Bar Chart
+       * ========================================== */
+      const resultsData = {
+        A: {
+          badge: 'Country A',
+          callout: 'Nearly tied with PMT: most of the signal is linear.',
+          warn: false,
+          lgbLL: 0.2827,
+          pmtLL: 0.3048,
+          lgbAUC: 0.9504,
+          pmtAUC: 0.9462,
+          threshold: '0.5336',
+          lgbAcc: '87.13%',
+          pmtAcc: '87.10%',
+          lgbF1: '0.8574',
+          pmtF1: '0.8575',
+          pmtExcl: 14.07,
+          lgbExcl: 14.26,
+          pmtIncl: '11.93%',
+          lgbIncl: '11.73%'
+        },
+        B: {
+          badge: 'Country B',
+          callout: 'Log loss falls 65%, but AUC does not improve and 70.52% of poor households are still excluded. Accuracy of 89.12% is below the 92.3% of labelling everyone non-poor.',
+          warn: true,
+          lgbLL: 0.2387,
+          pmtLL: 0.6865,
+          lgbAUC: 0.7750,
+          pmtAUC: 0.7896,
+          threshold: '0.2156',
+          lgbAcc: '89.12%',
+          pmtAcc: '87.90%',
+          lgbF1: '0.2948',
+          pmtF1: '0.2989',
+          pmtExcl: 66.53,
+          lgbExcl: 70.52,
+          pmtIncl: '7.56%',
+          lgbIncl: '5.89%'
+        },
+        C: {
+          badge: 'Country C',
+          callout: 'Exclusion error cut by about 95% (36.69% → 1.85%).',
+          warn: false,
+          lgbLL: 0.0190,
+          pmtLL: 0.1852,
+          lgbAUC: 0.9988,
+          pmtAUC: 0.9566,
+          threshold: '0.3382',
+          lgbAcc: '99.44%',
+          pmtAcc: '91.73%',
+          lgbF1: '0.9815',
+          pmtF1: '0.6972',
+          pmtExcl: 36.69,
+          lgbExcl: 1.85,
+          pmtIncl: '3.24%',
+          lgbIncl: '0.33%'
+        },
+        Average: {
+          badge: 'Overall Average (3 Countries)',
+          callout: 'Across all 3 countries, LightGBM cuts average log loss from 0.3922 to 0.1801 and lifts average ROC-AUC from 0.8975 to 0.9081.',
+          warn: false,
+          lgbLL: 0.1801,
+          pmtLL: 0.3922,
+          lgbAUC: 0.9081,
+          pmtAUC: 0.8975,
+          threshold: 'n/a',
+          lgbAcc: '91.90%',
+          pmtAcc: '88.91%',
+          lgbF1: '0.7112',
+          pmtF1: '0.6179',
+          pmtExcl: null,
+          lgbExcl: null,
+          pmtIncl: 'n/a',
+          lgbIncl: 'n/a'
+        }
+      };
+
+      const resultsTabBtns = document.querySelectorAll('[data-results-tab]');
+      const barAucPmt = document.getElementById('bar-auc-pmt');
+      const barAucLgb = document.getElementById('bar-auc-lgb');
+      const valAucPmt = document.getElementById('val-auc-pmt');
+      const valAucLgb = document.getElementById('val-auc-lgb');
+
+      const barLlPmt = document.getElementById('bar-ll-pmt');
+      const barLlLgb = document.getElementById('bar-ll-lgb');
+      const valLlPmt = document.getElementById('val-ll-pmt');
+      const valLlLgb = document.getElementById('val-ll-lgb');
+
+      const exclBlock = document.getElementById('exclusion-chart-block');
+      const barExclPmt = document.getElementById('bar-excl-pmt');
+      const barExclLgb = document.getElementById('bar-excl-lgb');
+      const valExclPmt = document.getElementById('val-excl-pmt');
+      const valExclLgb = document.getElementById('val-excl-lgb');
+
+      const countryBadge = document.getElementById('results-country-badge');
+      const calloutBox = document.getElementById('results-callout-box');
+      const kpiThreshold = document.getElementById('kpi-threshold');
+      const kpiAcc = document.getElementById('kpi-acc');
+      const kpiF1 = document.getElementById('kpi-f1');
+      const kpiIncl = document.getElementById('kpi-incl');
+
+      function updateResultsView(key) {
+        const d = resultsData[key];
+        if (!d) return;
+
+        resultsTabBtns.forEach(btn => {
+          const active = btn.dataset.resultsTab === key;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+
+        // Update Bars
+        barAucPmt.style.width = `${d.pmtAUC * 100}%`;
+        barAucLgb.style.width = `${d.lgbAUC * 100}%`;
+        valAucPmt.textContent = d.pmtAUC.toFixed(4);
+        valAucLgb.textContent = d.lgbAUC.toFixed(4);
+
+        // Log loss scaled relative to 0.75 max
+        barLlPmt.style.width = `${Math.min(100, (d.pmtLL / 0.75) * 100)}%`;
+        barLlLgb.style.width = `${Math.min(100, (d.lgbLL / 0.75) * 100)}%`;
+        barLlPmt.style.background = key === 'B' ? 'var(--rose)' : 'var(--indigo)';
+        valLlPmt.textContent = d.pmtLL.toFixed(4);
+        valLlLgb.textContent = d.lgbLL.toFixed(4);
+
+        if (d.pmtExcl !== null) {
+          exclBlock.style.opacity = '1';
+          barExclPmt.style.width = `${d.pmtExcl}%`;
+          barExclLgb.style.width = `${d.lgbExcl}%`;
+          barExclLgb.style.background = key === 'B' ? 'var(--rose)' : 'var(--amber)';
+          valExclPmt.textContent = `${d.pmtExcl.toFixed(2)}%`;
+          valExclLgb.textContent = `${d.lgbExcl.toFixed(2)}%`;
+        } else {
+          barExclPmt.style.width = '0%';
+          barExclLgb.style.width = '0%';
+          valExclPmt.textContent = 'See A/B/C';
+          valExclLgb.textContent = 'See A/B/C';
+        }
+
+        // Update Callout & KPIs
+        countryBadge.textContent = d.badge;
+        countryBadge.className = `badge ${d.warn ? 'badge-rose' : 'badge-teal'}`;
+        calloutBox.textContent = d.callout;
+        calloutBox.className = `callout-quote ${d.warn ? 'warn' : ''}`;
+
+        kpiThreshold.textContent = d.threshold;
+        kpiAcc.textContent = `${d.lgbAcc} / ${d.pmtAcc}`;
+        kpiF1.textContent = `${d.lgbF1} / ${d.pmtF1}`;
+        kpiIncl.textContent = d.lgbIncl === 'n/a' ? 'Per country below' : `${d.lgbIncl} / ${d.pmtIncl}`;
+
+        // Highlight table rows
+        document.querySelectorAll('#metrics-table-body tr, #errors-table-body tr').forEach(row => {
+          row.classList.toggle('highlight-row', row.dataset.row === key);
+        });
+      }
+
+      resultsTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => updateResultsView(btn.dataset.resultsTab));
+      });
+      updateResultsView('A');
+
+      // Hover Tooltips on Bars
+      const tooltipEl = document.getElementById('chart-tooltip');
+      document.querySelectorAll('.bar-row[data-tooltip-label]').forEach(row => {
+        row.addEventListener('mouseenter', () => {
+          const label = row.dataset.tooltipLabel;
+          const val = row.querySelector('.bar-val')?.textContent || '';
+          tooltipEl.textContent = `${label}: ${val}`;
+          tooltipEl.classList.add('show');
+        });
+        row.addEventListener('mousemove', (e) => {
+          tooltipEl.style.left = `${Math.min(window.innerWidth - 180, e.clientX + 12)}px`;
+          tooltipEl.style.top = `${e.clientY - 36}px`;
+        });
+        row.addEventListener('mouseleave', () => {
+          tooltipEl.classList.remove('show');
+        });
+      });
+
+      /* ==========================================
+       * 8. Fairness Country Switcher
+       * ========================================== */
+      const fairnessData = {
+        A: {
+          title: 'Country A · Exclusion Error by Household Size',
+          small: { pct: 34.84, label: '34.84%', sub: '244 poor, 16.8% of group', color: 'var(--amber)' },
+          med: { pct: 14.87, label: '14.87%', sub: '1,843 poor, 44.4%', color: 'var(--amber)' },
+          large: { pct: 10.46, label: '10.46%', sub: '1,616 poor, 62.2%', color: 'var(--amber)' }
+        },
+        B: {
+          title: 'Country B · Exclusion Error by Household Size',
+          small: { pct: 0, label: 'N/A', sub: '0 poor of 203 households', color: 'var(--muted)' },
+          med: { pct: 69.23, label: '69.23%', sub: '65 poor, 5.4%', color: 'var(--rose)' },
+          large: { pct: 70.81, label: '70.81%', sub: '185 poor, 10.1%', color: 'var(--rose)' }
+        },
+        C: {
+          title: 'Country C · Exclusion Error by Household Size',
+          small: { pct: 8.11, label: '8.11%', sub: '37 poor, 2.0%', color: 'var(--amber)' },
+          med: { pct: 1.70, label: '1.70%', sub: '294 poor, 11.6%', color: 'var(--teal)' },
+          large: { pct: 1.57, label: '1.57%', sub: '637 poor, 30.7%', color: 'var(--teal)' }
+        }
+      };
+
+      const fairnessTabs = document.querySelectorAll('[data-fairness-tab]');
+      const fairTitle = document.getElementById('fairness-chart-title');
+      const fairBarSmall = document.getElementById('fair-bar-small');
+      const fairValSmall = document.getElementById('fair-val-small');
+      const fairSubSmall = document.getElementById('fair-sub-small');
+      const fairBarMed = document.getElementById('fair-bar-med');
+      const fairValMed = document.getElementById('fair-val-med');
+      const fairSubMed = document.getElementById('fair-sub-med');
+      const fairBarLarge = document.getElementById('fair-bar-large');
+      const fairValLarge = document.getElementById('fair-val-large');
+      const fairSubLarge = document.getElementById('fair-sub-large');
+
+      function updateFairnessView(country) {
+        const d = fairnessData[country];
+        if (!d) return;
+
+        fairnessTabs.forEach(btn => {
+          const active = btn.dataset.fairnessTab === country;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+
+        fairTitle.textContent = d.title;
+
+        fairBarSmall.style.width = `${d.small.pct}%`;
+        fairBarSmall.style.background = d.small.color;
+        fairValSmall.textContent = d.small.label;
+        fairSubSmall.textContent = d.small.sub;
+
+        fairBarMed.style.width = `${d.med.pct}%`;
+        fairBarMed.style.background = d.med.color;
+        fairValMed.textContent = d.med.label;
+        fairSubMed.textContent = d.med.sub;
+
+        fairBarLarge.style.width = `${d.large.pct}%`;
+        fairBarLarge.style.background = d.large.color;
+        fairValLarge.textContent = d.large.label;
+        fairSubLarge.textContent = d.large.sub;
+      }
+
+      fairnessTabs.forEach(btn => {
+        btn.addEventListener('click', () => updateFairnessView(btn.dataset.fairnessTab));
+      });
+      updateFairnessView('A');
+
+      /* ==========================================
+       * 9. Feature Importance Country Switcher
+       * ========================================== */
+      const featureData = {
+        A: {
+          max: 420,
+          items: [
+            { name: 'TiwRslOh', val: '399.0', num: 399.0 },
+            { name: 'ukWqmeSS_mean', val: '380.6', num: 380.6 },
+            { name: 'ukWqmeSS_sum', val: '280.4', num: 280.4 },
+            { name: 'hh_size', val: '266.2', num: 266.2 },
+            { name: 'vwpsXRGk', val: '242.0', num: 242.0 }
+          ]
+        },
+        B: {
+          max: 50,
+          items: [
+            { name: 'gKsBCLMY_sum', val: '34.8', num: 34.8 },
+            { name: 'toNGbjGF', val: '34.0', num: 34.0 },
+            { name: 'vuQrLzvK', val: '32.6', num: 32.6 },
+            { name: 'ulQCDoYe_max', val: '28.2', num: 28.2 },
+            { name: 'TZDgOhYY_mean', val: '28.0', num: 28.0 }
+          ]
+        },
+        C: {
+          max: 900,
+          items: [
+            { name: 'DBjxSUvf', val: '849.8', num: 849.8 },
+            { name: 'xFKmUXhu', val: '384.4', num: 384.4 },
+            { name: 'kiAJBGqv', val: '210.4', num: 210.4 },
+            { name: 'EQtGHLFz', val: '139.8', num: 139.8 },
+            { name: 'vWNISgEA_sum', val: '134.6', num: 134.6 }
+          ]
+        }
+      };
+
+      const featTabs = document.querySelectorAll('[data-feat-tab]');
+      const featTitle = document.getElementById('feat-chart-title');
+      const featContainer = document.getElementById('feature-bars-container');
+
+      function updateFeatureView(country) {
+        const d = featureData[country];
+        if (!d) return;
+
+        featTabs.forEach(btn => {
+          const active = btn.dataset.featTab === country;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+
+        featTitle.textContent = `Country ${country} · Top 5 Features`;
+        featContainer.innerHTML = '';
+
+        d.items.forEach(item => {
+          const pct = Math.min(100, (item.num / d.max) * 100);
+          const row = document.createElement('div');
+          row.className = 'feature-row';
+          row.innerHTML = `
+            <div class="feature-head">
+              <span class="feature-name">${item.name}</span>
+              <span class="feature-score">${item.val}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: 0%; background: var(--teal);"></div>
+            </div>
+          `;
+          featContainer.appendChild(row);
+          const fill = row.querySelector('.bar-fill');
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              fill.style.width = `${pct}%`;
+            });
+          });
+        });
+      }
+
+      featTabs.forEach(btn => {
+        btn.addEventListener('click', () => updateFeatureView(btn.dataset.featTab));
+      });
+      updateFeatureView('A');
+
+      /* ==========================================
+       * 10. Interactive Route-Planning BFS Demo
+       * ========================================== */
+      const adjacency = {
+        HQ: ['District_A', 'District_B'],
+        District_A: ['Community_1', 'Community_2'],
+        District_B: ['Community_3'],
+        Community_1: ['Target_Zone_Alpha'],
+        Community_2: ['Target_Zone_Beta'],
+        Community_3: ['Target_Zone_Alpha'],
+        Target_Zone_Alpha: [],
+        Target_Zone_Beta: []
+      };
+
+      const bfsGoalSelect = document.getElementById('bfs-goal');
+      const bfsRunBtn = document.getElementById('bfs-run-btn');
+      const bfsResetBtn = document.getElementById('bfs-reset-btn');
+      const bfsStatusBadge = document.getElementById('bfs-status-badge');
+      const bfsQueueList = document.getElementById('bfs-queue-list');
+      const bfsExploredList = document.getElementById('bfs-explored-list');
+      const bfsExploredCount = document.getElementById('bfs-explored-count');
+      const bfsPathList = document.getElementById('bfs-path-list');
+
+      let bfsTimers = [];
+
+      function clearBfsTimers() {
+        bfsTimers.forEach(t => clearTimeout(t));
+        bfsTimers = [];
+      }
+
+      function resetBfsVisuals() {
+        clearBfsTimers();
+        document.querySelectorAll('.graph-node').forEach(n => {
+          n.classList.remove('queued', 'explored', 'shortest');
+        });
+        document.querySelectorAll('.graph-edge').forEach(e => {
+          e.classList.remove('explored', 'shortest');
+        });
+        bfsQueueList.innerHTML = '<span style="font-size:0.84rem; color:var(--muted);">Click "Run BFS" to start traversal.</span>';
+        bfsExploredList.innerHTML = '';
+        bfsExploredCount.textContent = '0';
+        bfsPathList.innerHTML = '';
+        bfsStatusBadge.textContent = 'Ready to run';
+        bfsStatusBadge.className = 'badge badge-teal';
+      }
+
+      function renderChips(container, items, extraClass = '') {
+        container.innerHTML = '';
+        if (items.length === 0) {
+          container.innerHTML = '<span style="font-size:0.82rem; color:var(--muted);">Empty</span>';
+          return;
+        }
+        items.forEach((item, idx) => {
+          const span = document.createElement('span');
+          span.className = `node-chip ${extraClass}`.trim();
+          span.textContent = extraClass && idx < items.length - 1 ? `${item} →` : item;
+          container.appendChild(span);
+        });
+      }
+
+      function runBfsAnimation() {
+        resetBfsVisuals();
+        const goal = bfsGoalSelect.value;
+        const queue = ['HQ'];
+        const discovered = new Set(['HQ']);
+        const parentMap = { HQ: null };
+        const exploredOrder = [];
+        const steps = [];
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+          exploredOrder.push(current);
+
+          if (current === goal) {
+            steps.push({
+              current,
+              queueSnapshot: [...queue],
+              exploredSnapshot: [...exploredOrder],
+              done: true
+            });
+            break;
+          }
+
+          for (const neighbor of adjacency[current] || []) {
+            if (!discovered.has(neighbor)) {
+              discovered.add(neighbor);
+              parentMap[neighbor] = current;
+              queue.push(neighbor);
+            }
+          }
+
+          steps.push({
+            current,
+            queueSnapshot: [...queue],
+            exploredSnapshot: [...exploredOrder],
+            done: false
+          });
+        }
+
+        // Reconstruct shortest path
+        const shortestPath = [];
+        let curr = goal;
+        while (curr) {
+          shortestPath.unshift(curr);
+          curr = parentMap[curr];
+        }
+
+        const stepDelay = prefersReducedMotion ? 0 : 480;
+        bfsStatusBadge.textContent = 'Exploring queue...';
+        bfsStatusBadge.className = 'badge badge-indigo';
+
+        steps.forEach((step, idx) => {
+          const timer = setTimeout(() => {
+            const nodeEl = document.getElementById(`node-${step.current}`);
+            if (nodeEl) {
+              nodeEl.classList.remove('queued');
+              nodeEl.classList.add('explored');
+            }
+
+            // Highlight edge from parent
+            const p = parentMap[step.current];
+            if (p) {
+              const edgeEl = document.getElementById(`edge-${p}-${step.current}`);
+              if (edgeEl) edgeEl.classList.add('explored');
+            }
+
+            // Highlight queued nodes
+            step.queueSnapshot.forEach(qNode => {
+              const qEl = document.getElementById(`node-${qNode}`);
+              if (qEl && !qEl.classList.contains('explored')) {
+                qEl.classList.add('queued');
+              }
+            });
+
+            renderChips(bfsQueueList, step.queueSnapshot);
+            renderChips(bfsExploredList, step.exploredSnapshot);
+            bfsExploredCount.textContent = String(step.exploredSnapshot.length);
+
+            if (step.done) {
+              bfsStatusBadge.textContent = `Goal reached (${step.exploredSnapshot.length} explored)`;
+              bfsStatusBadge.className = 'badge badge-teal';
+
+              shortestPath.forEach((pNode, pIdx) => {
+                const pNodeEl = document.getElementById(`node-${pNode}`);
+                if (pNodeEl) pNodeEl.classList.add('shortest');
+                if (pIdx > 0) {
+                  const prev = shortestPath[pIdx - 1];
+                  const sEdge = document.getElementById(`edge-${prev}-${pNode}`);
+                  if (sEdge) sEdge.classList.add('shortest');
+                }
+              });
+
+              renderChips(bfsPathList, shortestPath, 'path-chip');
+            }
+          }, idx * stepDelay);
+          bfsTimers.push(timer);
+        });
+      }
+
+      bfsRunBtn.addEventListener('click', runBfsAnimation);
+      bfsResetBtn.addEventListener('click', resetBfsVisuals);
+      bfsGoalSelect.addEventListener('change', resetBfsVisuals);
+    })();
+  </script>
+</body>
+</html>
+```
